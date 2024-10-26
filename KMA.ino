@@ -1,18 +1,39 @@
 #include <LiquidCrystal.h>
 #include <Servo.h>
 
-LiquidCrystal lcd(5, 4, 44, 45, 46, 47);
+/*
+ * LCD CONFIGURATION
+ * LCD RS pin to digital pin 8
+ * LCD Enable pin to digital pin 7
+ * LCD D4 pin to digital pin 6
+ * LCD D5 pin to digital pin 5
+ * LCD D6 pin to digital pin 3
+ * LCD D7 pin to digital pin 2
+ * LCD R/W pin to ground
+ * LCD VSS pin to ground
+ * LCD VCC pin to 5V
+ * K Cathode -GCC
+ * A Anode - +5 via 10 ohm resistor
+*/
+const int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 Servo myServo;
 
-const int SERVO_PIN = 11;
-const int CLOCK = 10;
-const int DATA = 9;
-const int RESET = 8;
-const int BUZZER_PIN = 52;
+//Servo Motor
+//Red - +5V
+//Brown - GCC
+//Yellow - ServoPin 13
+const int SERVO_PIN = 13;
+
+//360 Rotot
+const int RESET = 9;
+const int DATA = 10;
+const int CLOCK = 11;
+//Buzzer
+const int BUZZER_PIN = 4;
 
 int centerAngle = 90;
 int angleToMove = 50;
-
 int lastStateCLK;
 int currentStateCLK;
 int timerValue = 3600; // 60 minutes (3600 seconds)
