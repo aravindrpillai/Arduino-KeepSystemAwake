@@ -38,6 +38,7 @@ int lastStateCLK;
 int currentStateCLK;
 int timerValue = 3600; // 60 minutes (3600 seconds)
 int elapsedTime = 3600; // Also in seconds
+int incrementBy = 600; //10 mins - this will increase the time when the knob is rotated
 
 unsigned long lastDebounceTime = 0;
 unsigned long lastTimerUpdate = 0;
@@ -68,10 +69,10 @@ void loop() {
     if ((millis() - lastDebounceTime) > debounceDelay) {
       lastDebounceTime = millis();
       if (digitalRead(DATA) != currentStateCLK) {
-        timerValue -= 60;  // Decrease by 1 minute (60 seconds)
+        timerValue -= incrementBy;
         if (timerValue < 0) timerValue = 0;
       } else {
-        timerValue += 60;  // Increase by 1 minute (60 seconds)
+        timerValue += incrementBy;
       }
       updateLCD(timerValue, elapsedTime);
     }
@@ -89,7 +90,8 @@ void loop() {
     lastTimerUpdate = millis();
     elapsedTime--;
     if (elapsedTime <= 0) {
-      beep(); 
+      beep();
+      shutSystem();
       elapsedTime = timerValue;
     }
     updateLCD(timerValue, elapsedTime);
@@ -139,4 +141,17 @@ void updateLCD(int timer, int elapsed) {
   lcd.print(":");
   if (seconds < 10) lcd.print("0");
   lcd.print(seconds);
+}
+
+//function to keep tuen off the system once the time is elapsed
+void shutSystem(){
+  lcd.setCursor(0, 1);
+  lcd.print("..... Done .....");
+  while(true){
+    if (digitalRead(RESET) == LOW) {
+      elapsedTime = timerValue;
+      updateLCD(timerValue, elapsedTime);
+      delay(200); // Simple debounce delay
+    }
+  }
 }
