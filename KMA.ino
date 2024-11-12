@@ -151,7 +151,7 @@ void shutSystem(){
     if (digitalRead(RESET) == LOW) {
       elapsedTime = timerValue;
       updateLCD(timerValue, elapsedTime);
-      delay(200); // Simple debounce delay
+      break;
     }
   }
 }
