@@ -14,22 +14,22 @@
  * LCD VCC pin to 5V
  * K Cathode -GCC
  * A Anode - +5 via 10 ohm resistor
-*/
+ */
 const int rs = 8, en = 7, d4 = 6, d5 = 5, d6 = 3, d7 = 2;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 Servo myServo;
 
-//Servo Motor
-//Red - +5V
-//Brown - GCC
-//Yellow - ServoPin 13
+// Servo Motor
+// Red - +5V
+// Brown - GCC
+// Yellow - ServoPin 13
 const int SERVO_PIN = 13;
 
-//360 Rotot
+// 360 Rotot
 const int RESET = 9;
 const int DATA = 10;
 const int CLOCK = 11;
-//Buzzer
+// Buzzer
 const int BUZZER_PIN = 4;
 
 int centerAngle = 90;
@@ -38,14 +38,13 @@ int lastStateCLK;
 int currentStateCLK;
 int timerValue = 3600; // 60 minutes (3600 seconds)
 int elapsedTime = 3600; // Also in seconds
-int incrementBy = 600; //10 mins - this will increase the time when the knob is rotated
-
+int incrementByMinutes = 10; // 10 minutes
 unsigned long lastDebounceTime = 0;
 unsigned long lastTimerUpdate = 0;
-unsigned long lastServoMove = 0;  // To track the time for servo movement
+unsigned long lastServoMove = 0; // To track the time for servo movement
 const unsigned long debounceDelay = 50;
 const unsigned long secondInterval = 1000; // 1 second in milliseconds
-const unsigned long servoInterval = 10000;  // 10 seconds in milliseconds
+const unsigned long servoInterval = 10000; // 10 seconds in milliseconds
 bool moveLeft = true;
 
 void setup() {
@@ -56,7 +55,7 @@ void setup() {
   pinMode(RESET, INPUT_PULLUP);
   lastStateCLK = digitalRead(CLOCK);
   updateLCD(timerValue, elapsedTime);
-  
+
   myServo.attach(SERVO_PIN);
   myServo.write(centerAngle);
 }
@@ -69,10 +68,11 @@ void loop() {
     if ((millis() - lastDebounceTime) > debounceDelay) {
       lastDebounceTime = millis();
       if (digitalRead(DATA) != currentStateCLK) {
-        timerValue -= incrementBy;
-        if (timerValue < 0) timerValue = 0;
+        timerValue -= incrementByMinutes * 60; // Convert minutes to seconds
+        if (timerValue <= 600) timerValue = 600; //minimun 10 mins
       } else {
-        timerValue += incrementBy;
+        timerValue += incrementByMinutes * 60; // Convert minutes to seconds
+        if (timerValue >= 30000) timerValue = 30000; //maximum 500 mins
       }
       updateLCD(timerValue, elapsedTime);
     }
@@ -143,11 +143,11 @@ void updateLCD(int timer, int elapsed) {
   lcd.print(seconds);
 }
 
-//function to keep tuen off the system once the time is elapsed
-void shutSystem(){
+// Function to shut down the system once time is elapsed
+void shutSystem() {
   lcd.setCursor(0, 1);
   lcd.print("..... Done .....");
-  while(true){
+  while (true) {
     if (digitalRead(RESET) == LOW) {
       elapsedTime = timerValue;
       updateLCD(timerValue, elapsedTime);
